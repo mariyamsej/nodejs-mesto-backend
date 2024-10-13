@@ -12,16 +12,6 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
   } catch (err) {
     return next(err);
   }
-
-  // return User.find({})
-  //   .then(users => {
-  //     res.send({ data: users})
-  //     return;
-  //   })
-  //   .catch(err => {
-  //     res.status(500).send( {message: 'Error retrieving users' + err.message })
-  //     return;
-  //   });
 };
 
 export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
@@ -41,18 +31,6 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
   } catch (err) {
     return next(err);
   }
-
-  // User.findById(userId)
-  // .then(user => {
-  //   if (!user) {
-  //     return res.status(404).json({ message: 'User not found' });
-  //   }
-  //   res.status(200).json(user);
-  // })
-  // .catch(err => {
-  //   res.status(500).json({ message: 'Error retrieving user: ' + err.message });
-  // });
-
 };
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -74,17 +52,6 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     console.error('Ошибка создания юзера:', err);
     return next(err);
   }
-
-  // User.create({ name, about, avatar })
-  //   .then(user => {
-  //     res.status(201).send({ data: user });
-  //     return;
-  //   })
-  //   .catch(err => {
-  //     console.error('Ошибка создания юзера:', err);
-  //     res.status(500).send({ message: 'Произошла ошибка' });
-  //     return;
-  //   });
 };
 
 export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
@@ -92,21 +59,6 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
   const userId = req.body.user._id;
 
   console.log(userId);
-
-  /* User.findByIdAndUpdate(
-      userId,
-      { name, about },
-      { new: true, runValidators: true }
-    )
-      .then((user) => {
-        if (!user) {
-          return res.status(404).send({ message: 'Пользователь не найден' });
-      }
-        res.send({ data: user });
-      })
-      .catch((err) => {
-        res.status(500).send({ message: `Ошибка при обновлении профиля: ${err.message}` });
-      }); */
 
   try {
     if (!name || !about) {
@@ -158,19 +110,4 @@ export const updateAvatar = async (req: Request, res: Response, next: NextFuncti
   } catch (err) {
     return next(err);
   }
-
-  // User.findByIdAndUpdate(
-  //   userId,
-  //   { avatar },
-  //   { new: true, runValidators: true }
-  // )
-  //   .then((user) => {
-  //     if (!user) {
-  //       return res.status(404).send({ message: 'Пользователь не найден' });
-  //     }
-  //     res.send({ data: user });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).send({ message: `Ошибка при обновлении аватара: ${err.message}` });
-  //   });
 };

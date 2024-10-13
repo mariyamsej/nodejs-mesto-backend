@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   req.body.user = {
-    _id: '670ac3c44bd3f4df49691fab' // вставьте сюда _id созданного в предыдущем пункте пользователя
+    _id: '670ac3c44bd3f4df49691fab' // _id пользователя
   };
 
   console.log(req.body);

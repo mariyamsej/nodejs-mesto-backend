@@ -53,17 +53,6 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  // Card.findByIdAndDelete(cardId)
-  //   .then(card => {
-  //     if (!card) {
-  //       return res.status(404).send({ message: 'Карточка не найдена' });
-  //     }
-  //     res.status(200).send({ message: 'Карточка успешно удалена', data: card });
-  //   })
-  //   .catch(err => {
-  //     console.error('Ошибка при удалении карточки:', err);
-  //     res.status(500).send({ message: 'Произошла ошибка при удалении карточки' });
-  //   });
 
   console.log(req.params);
 
@@ -109,21 +98,6 @@ export const likeCard = async (req: Request, res: Response, next: NextFunction) 
   } catch (err) {
     return next(err);
   }
-
-  // Card.findByIdAndUpdate(
-  //   req.params.cardId,
-  //   { $addToSet: { likes: userId } },
-  //   { new: true }
-  // )
-  //   .then((card) => {
-  //     if (!card) {
-  //       return res.status(404).send({ message: 'Карточка не найдена' });
-  //     }
-  //     res.send({ data: card });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).send({ message: `Ошибка при добавлении лайка: ${err.message}` });
-  //   });
 };
 
 export const dislikeCard = async (req: Request, res: Response, next: NextFunction) => {
@@ -149,19 +123,4 @@ export const dislikeCard = async (req: Request, res: Response, next: NextFunctio
   } catch (err) {
     return next(err);
   }
-
-  // Card.findByIdAndUpdate(
-  //   req.params.cardId,
-  //   { $pull: { likes: userId } },
-  //   { new: true }
-  // )
-  //   .then((card) => {
-  //     if (!card) {
-  //       return res.status(404).send({ message: 'Карточка не найдена' });
-  //     }
-  //     res.send({ data: card });
-  //   })
-  //   .catch((err) => {
-  //     res.status(500).send({ message: `Ошибка при удалении лайка: ${err.message}` });
-  //   });
 };
