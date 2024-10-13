@@ -6,7 +6,7 @@ import { errorHandler } from '../middlewares/errorHandler';
 import userRoutes from '../routes/users';
 import cardRoutes from '../routes/cards';
 
-const { PORT = 3000, BASE_PATH } = process.env;
+const { PORT = 3000 } = process.env;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
@@ -33,5 +33,4 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
-  console.log(BASE_PATH);
 });

@@ -1,9 +1,12 @@
+export const HTTP_STATUS_NOT_FOUND = 404;
+export const HTTP_STATUS_BAD_REQUEST = 400;
+
 export class NotFoundError extends Error {
   statusCode: number;
 
   constructor(message: string) {
     super(message);
-    this.statusCode = 404;
+    this.statusCode = HTTP_STATUS_NOT_FOUND;
   }
 }
 
@@ -12,15 +15,6 @@ export class BadRequestError extends Error {
 
   constructor(message: string) {
     super(message);
-    this.statusCode = 400;
-  }
-}
-
-export class UnauthorizedError extends Error {
-  statusCode: number;
-
-  constructor(message: string) {
-    super(message);
-    this.statusCode = 401;
+    this.statusCode = HTTP_STATUS_BAD_REQUEST;
   }
 }
