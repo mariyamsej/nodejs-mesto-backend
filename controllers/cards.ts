@@ -23,32 +23,18 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
   console.log(name, link);
 
   try {
-    if (!name || !link) {
-      throw new BadRequestError('Не переданы все необходимые данные');
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(ownerId)) {
-      throw new BadRequestError('Некорректный id владельца карточки');
-    }
-
     const card = await Card.create({ name, link, owner: ownerId });
     res.status(201).send({ data: card });
     return;
   } catch (err) {
-    console.error('Ошибка создания карты юзера:', err);
-    return next(err);
+    if (err instanceof Error && err.name == 'ValidationError') {
+      console.log(err);
+      next(new BadRequestError('Переданы некорректные данные для создания карточки пользователя'));
+    }
+    else {
+      next(err);
   }
-
-  // Card.create({ name, link, owner: ownerId })
-  // .then(card => {
-  //   res.status(201).send({ data: card });
-  //   return;
-  // })
-  // .catch(err => {
-  //   console.error('Ошибка создания карты юзера:', err);
-  //   res.status(500).send({ message: 'Произошла ошибка' });
-  //   return;
-  // });
+  }
 };
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {

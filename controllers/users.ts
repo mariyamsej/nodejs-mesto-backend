@@ -37,20 +37,19 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
   const { name, about, avatar } = req.body;
 
   try {
-    if (!name || !about  ||!avatar) {
-      throw new BadRequestError('Не переданы все необходимые данные');
-    }
-
-    // if (!mongoose.Types.string.isValid(avatar)) {
-    //   throw new BadRequestError('Некорректный формат аватара');
-    // }
-
     const user = await User.create({ name, about, avatar });
     res.status(201).send({ data: user });
     return;
   } catch (err) {
-    console.error('Ошибка создания юзера:', err);
-    return next(err);
+    if (err instanceof Error && err.name == 'ValidationError') {
+      console.log(err);
+      next(new BadRequestError('Переданы некорректные данные для создания пользователя'));
+    }
+    else {
+      next(err);
+  }
+    // console.error('Ошибка создания юзера:', err);
+    // return next(err);
   }
 };
 
