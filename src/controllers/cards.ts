@@ -39,6 +39,7 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
+  const userId = req.user._id;
 
   console.log(req.params);
 

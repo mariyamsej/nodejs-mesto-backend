@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/users';
 import mongoose from 'mongoose';
-import { NotFoundError, BadRequestError } from '../errors/errors';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/users';
+import { NotFoundError, BadRequestError, UnauthorizedError } from '../errors/errors';
 
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -11,6 +13,24 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
     return;
   } catch (err) {
     return next(err);
+  }
+};
+
+export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.body.user._id;
+
+    console.log("******");
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new NotFoundError('Пользователь не найден');
+    }
+
+    res.status(200).send({ data: user });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -34,13 +54,29 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar } = req.body;
+  const { email, password, name, about, avatar } = req.body;
 
   try {
-    const user = await User.create({ name, about, avatar });
-    res.status(201).send({ data: user });
+    if (!email || !password) {
+      throw new BadRequestError('Email и пароль обязательны');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({ email, password: hashedPassword, name, about, avatar });
+    res.status(201).send({
+      data: {
+        _id: user._id,
+        email: user.email,
+        password: user.password,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      },
+    });
     return;
   } catch (err) {
+    // console.log(err);
     if (err instanceof Error && err.name == 'ValidationError') {
       console.log(err);
       next(new BadRequestError('Переданы некорректные данные для создания пользователя'));
@@ -108,5 +144,38 @@ export const updateAvatar = async (req: Request, res: Response, next: NextFuncti
     return;
   } catch (err) {
     return next(err);
+  }
+};
+
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  try {
+    // const user = await User.findOne ({ email })
+
+    // if (!user) {
+    //   throw new NotFoundError('Пользователь с данным id не найден');
+    // }
+
+    const user = await User.findUserByCredentials(email, password);
+
+    console.log(user);
+
+    const token = jwt.sign(
+      { _id: user._id },
+      'secret-token', // Используйте безопасный секрет в переменных окружения (например, process.env.JWT_SECRET)
+      { expiresIn: '7d' }
+    );
+
+    res
+      .cookie('jwt', token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .send({ message: 'Успешный вход' }); //token
+  } catch (err) {
+    console.log(err);
+    next(new UnauthorizedError('Неправильные почта или пароль'));
   }
 };
