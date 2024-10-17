@@ -1,46 +1,54 @@
 import { Request, Response, NextFunction } from 'express';
-import Card from '../models/cards';
 import mongoose from 'mongoose';
-import { NotFoundError, BadRequestError } from '../errors/errors';
+import Card from '../models/cards';
+import { ForbiddenError } from '../errors/forbidden-error';
+import { NotFoundError } from '../errors/not-found-error';
+import { BadRequestError } from '../errors/bad-request-error';
+import { UnauthorizedError } from '../errors/unauthorised-error';
 
 export const getCards = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cards = await Card.find({});
 
     res.status(200).json(cards);
-    return;
   } catch (err) {
-    return next(err);
+    next(err);
   }
 };
 
 export const createCard = async (req: Request, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
 
-  const ownerId = req.body.user._id;
+  if (!req.user) {
+    throw new UnauthorizedError('Необходима авторизация');
+  }
 
-  console.log(req.body.user._id);
-  console.log(name, link);
+  const ownerId = req.user._id;
+
+  // console.log(req.user._id);
+  // console.log(name, link);
 
   try {
     const card = await Card.create({ name, link, owner: ownerId });
     res.status(201).send({ data: card });
-    return;
   } catch (err) {
-    if (err instanceof Error && err.name == 'ValidationError') {
+    if (err instanceof Error && err.name === 'ValidationError') {
       console.log(err);
       next(new BadRequestError('Переданы некорректные данные для создания карточки пользователя'));
-    }
-    else {
+    } else {
       next(err);
-  }
+    }
   }
 };
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  const userId = req.user._id;
 
+  if (!req.user) {
+    return next(new UnauthorizedError('Необходима авторизация'));
+  }
+
+  const userId = req.user._id;
   console.log(req.params);
 
   try {
@@ -48,32 +56,34 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
       throw new BadRequestError('Некорректный id карточки');
     }
 
-    const card = await Card.findById(cardId);
-    if (!card) {
-      throw new NotFoundError('Карточка с данным id не найдена');
+    const card = await Card.findById(cardId).orFail(() => new NotFoundError('Карточка с данным id не найдена'));
+
+    if (card.owner.toString() !== userId) {
+      throw new ForbiddenError('Нельзя удалять карточки других пользователей');
     }
 
     await Card.findByIdAndDelete(cardId);
 
     res.status(200).send({ message: 'Карточка успешно удалена' });
+
     return;
   } catch (err) {
-    return next(err);
+    next(err);
   }
 };
 
 export const likeCard = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.body.user._id;
+  if (!req.user) {
+    throw new UnauthorizedError('Необходима авторизация');
+  }
+
+  const userId = req.user._id;
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-      throw new BadRequestError('Некорректный id карточки');
-    }
-
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $addToSet: { likes: userId } },
-      { new: true }
+      { new: true },
     );
 
     if (!card) {
@@ -83,22 +93,22 @@ export const likeCard = async (req: Request, res: Response, next: NextFunction) 
     res.send({ data: card });
     return;
   } catch (err) {
-    return next(err);
+    next(err);
   }
 };
 
 export const dislikeCard = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.body.user._id;
+  if (!req.user) {
+    throw new UnauthorizedError('Необходима авторизация');
+  }
+
+  const userId = req.user._id;
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-      throw new BadRequestError('Некорректный id карточки');
-    }
-
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
       { $pull: { likes: userId } },
-      { new: true }
+      { new: true },
     );
 
     if (!card) {
@@ -108,6 +118,6 @@ export const dislikeCard = async (req: Request, res: Response, next: NextFunctio
     res.send({ data: card });
     return;
   } catch (err) {
-    return next(err);
+    next(err);
   }
 };

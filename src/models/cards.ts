@@ -9,35 +9,40 @@ interface ICard {
   createdAt?: Date;
 }
 
-const cardSchema = new mongoose.Schema<ICard>({
-  name: {
-    type: String,
-    required: [true, 'Поле "name" должно быть заполнено'],
-    minlength: [2, 'Минимальная длина поля "name" - 2'],
-    maxlength: [30, 'Максимальная длина поля "name" - 30'],
-  },
-  link: {
-    type: String,
-    required: true
-  },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'user'
-  },
-  likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-    default: []
-  }],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-},
+const cardSchema = new mongoose.Schema<ICard>(
   {
-    versionKey: false
-  }
+    name: {
+      type: String,
+      required: [true, 'Поле "name" должно быть заполнено'],
+      minlength: [2, 'Минимальная длина поля "name" - 2'],
+      maxlength: [30, 'Максимальная длина поля "name" - 30'],
+    },
+    link: {
+      type: String,
+      required: true,
+      validate: {
+        validator: (v: string) => /^(https?:\/\/)(www\.)?[\w.-]+\.[a-z]{2,6}([\/\w .-]*)*\/?$/.test(v),
+        message: 'Некорректный формат ссылки',
+      },
+    },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'user',
+    },
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+      default: [],
+    }],
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    versionKey: false,
+  },
 );
 
 export default mongoose.model<ICard>('card', cardSchema);

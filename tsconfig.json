@@ -16,10 +16,10 @@
     "strict": true,                                      /* Enable all strict type-checking options. */
     /* Completeness */
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
-    "typeRoots" : ["./src/types", "./node_modules/@types"]
+    "typeRoots" : ["@types", "./node_modules/@types"]
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts", "@types/**/index.d.ts"
   ],
   "exclude": [
     "node_modules"
