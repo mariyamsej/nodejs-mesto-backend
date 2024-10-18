@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import { UnauthorizedError } from '../errors/unauthorised-error';
+
+dotenv.config();
 
 export default (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
@@ -15,7 +18,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'secret-token') as { _id: string };
+    payload = jwt.verify(token, process.env.JWT_SECRET as string) as { _id: string };
     req.user = payload;
     next();
     return;

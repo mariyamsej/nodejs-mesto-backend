@@ -11,9 +11,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
     res.status(HTTP_STATUS_BAD_REQUEST).send({
       message: celebrateError?.message || 'Ошибка валидации',
     });
-  }
-
-  if (err.code === 11000) {
+  } else if (err.code === 11000) {
     res.status(HTTP_STATUS_CONFLICT).send({ message: 'Пользователь с таким email уже существует' });
   }
 

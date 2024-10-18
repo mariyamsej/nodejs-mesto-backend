@@ -19,9 +19,9 @@ export const getCards = async (req: Request, res: Response, next: NextFunction) 
 export const createCard = async (req: Request, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
 
-  if (!req.user) {
-    throw new UnauthorizedError('Необходима авторизация');
-  }
+  // if (!req.user) {
+  //   throw new UnauthorizedError('Необходима авторизация');
+  // }
 
   const ownerId = req.user._id;
 
@@ -33,7 +33,7 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
     res.status(201).send({ data: card });
   } catch (err) {
     if (err instanceof Error && err.name === 'ValidationError') {
-      console.log(err);
+      // console.log(err);
       next(new BadRequestError('Переданы некорректные данные для создания карточки пользователя'));
     } else {
       next(err);
@@ -49,7 +49,7 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
   }
 
   const userId = req.user._id;
-  console.log(req.params);
+  // console.log(req.params);
 
   try {
     if (!mongoose.Types.ObjectId.isValid(cardId)) {
@@ -73,9 +73,9 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
 };
 
 export const likeCard = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    throw new UnauthorizedError('Необходима авторизация');
-  }
+  // if (!req.user) {
+  //   throw new UnauthorizedError('Необходима авторизация');
+  // }
 
   const userId = req.user._id;
 
@@ -98,9 +98,9 @@ export const likeCard = async (req: Request, res: Response, next: NextFunction) 
 };
 
 export const dislikeCard = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    throw new UnauthorizedError('Необходима авторизация');
-  }
+  // if (!req.user) {
+  //   throw new UnauthorizedError('Необходима авторизация');
+  // }
 
   const userId = req.user._id;
 
